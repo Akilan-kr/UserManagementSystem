@@ -1,5 +1,6 @@
 package com.example.usermanagementsystem.usermanagementsystem.Service.Interface;
 
+import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserNameUpdateDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserRequestDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.UserResponseDto;
 import org.springframework.data.domain.Page;
@@ -20,4 +21,6 @@ public interface IUserService {
     void deleteUserById(Integer id);
 
     List<UserResponseDto> CreateBulkUser(List<UserRequestDto> listOfUserRequestDto);
+
+    UserResponseDto updateName(UserNameUpdateDto userNameUpdateDto, Integer id);
 }

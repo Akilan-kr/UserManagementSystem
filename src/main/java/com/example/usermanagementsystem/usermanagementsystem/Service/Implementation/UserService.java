@@ -1,5 +1,6 @@
 package com.example.usermanagementsystem.usermanagementsystem.Service.Implementation;
 
+import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserNameUpdateDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserRequestDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.UserResponseDto;
 import com.example.usermanagementsystem.usermanagementsystem.Entity.UserInfo;
@@ -68,6 +69,17 @@ public class UserService implements IUserService {
         else
             userRepository.saveAll(validUsers);
             throw new PartialUserAlreadyAvailable("Partial update: Some Email in the List is already available", duplicateEmails);
+    }
+
+    @Override
+    public UserResponseDto updateName(UserNameUpdateDto userNameUpdateDto, Integer id) {
+        Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);
+        if(userInfo.isPresent()){
+            UserInfo user = userInfo.get();
+            user.setName(userNameUpdateDto.name());
+            return UserMapper.toResponse(userRepository.save(user));
+        } else
+            throw new UsernameNotFoundException("User with id:"+id+"Not founded");
     }
 
     @Override
