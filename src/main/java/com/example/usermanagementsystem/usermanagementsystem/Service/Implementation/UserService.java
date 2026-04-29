@@ -1,0 +1,135 @@
+package com.example.usermanagementsystem.usermanagementsystem.Service.Implementation;
+
+import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserRequestDto;
+import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.UserResponseDto;
+import com.example.usermanagementsystem.usermanagementsystem.Entity.UserInfo;
+import com.example.usermanagementsystem.usermanagementsystem.Exception.PartialUserAlreadyAvailable;
+import com.example.usermanagementsystem.usermanagementsystem.Exception.UserAlreadyAvailable;
+import com.example.usermanagementsystem.usermanagementsystem.Mapper.UserMapper;
+import com.example.usermanagementsystem.usermanagementsystem.Repository.UserRepository;
+import com.example.usermanagementsystem.usermanagementsystem.Service.Interface.IUserService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@Slf4j
+public class UserService implements IUserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder encoder) {
+        this.userRepository = userRepository;
+        this.encoder = encoder;
+    }
+
+
+    @Override
+    public UserResponseDto createUser(UserRequestDto userRequestDto) {
+        if(findByEmail(userRequestDto.email()) == null) {
+            log.info("Creating User");
+            UserInfo userInfo = UserMapper.toEntity(userRequestDto);
+            userInfo.setPassword(encoder.encode(userInfo.getPassword()));
+            userInfo.setIsActive(true);
+            return UserMapper.toResponse(userRepository.save(userInfo));
+        } else {
+            throw new UserAlreadyAvailable("User with this email is already available");
+        }
+    }
+
+
+    @Override
+    public List<UserResponseDto> CreateBulkUser(List<UserRequestDto> listOfUserRequestDto) {
+        List<String> duplicateEmails = new ArrayList<>();
+        List<UserInfo> validUsers = new ArrayList<>();
+        List<UserInfo> userInfos = listOfUserRequestDto.stream().map(UserMapper::toEntity).toList();
+        userInfos.forEach( userInfo -> {
+            if(findByEmail(userInfo.getEmail()) == null) {
+                String encrypt = encoder.encode(userInfo.getPassword());
+                userInfo.setPassword(encrypt);
+                userInfo.setIsActive(true);
+                validUsers.add(userInfo);
+            } else
+                duplicateEmails.add(userInfo.getEmail());
+        });
+        if(duplicateEmails.isEmpty())
+            return userRepository.saveAll(validUsers).stream().map(UserMapper::toResponse).toList();
+        else if(duplicateEmails.size() == userInfos.size())
+            throw new UserAlreadyAvailable("All the Emails in the List Request is already Available");
+        else
+            userRepository.saveAll(validUsers);
+            throw new PartialUserAlreadyAvailable("Partial update: Some Email in the List is already available", duplicateEmails);
+    }
+
+    @Override
+    public Page<UserResponseDto> getAllUsers(Pageable pageable, String search) {
+        log.info("Getting All Users");
+        Page<UserInfo> userInfos = userRepository.findByNameContainingIgnoreCaseAndIsActive(pageable, search, true);
+        return userInfos.map(UserMapper::toResponse);
+    }
+
+    //TODO
+    @Override
+    public UserResponseDto getUserById(Integer id) {
+            log.info("Getting user based on id({})", id);
+            Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);
+            if (userInfo.isPresent()) {
+                log.info("User with id({}) presented", id);
+                return UserMapper.toResponse(userInfo.get());
+            } else {
+                log.warn("There is no user with a id:{}", id);
+                throw new UsernameNotFoundException("User not found with id: " + id);
+            }
+    }
+
+
+    @Override
+    public UserResponseDto updateUser(UserRequestDto userRequestDto) {
+        log.info("Updating user");
+        UserInfo userInfo = UserMapper.toEntity(userRequestDto);
+        UserInfo existingUser = findByEmail(userInfo.getEmail());
+        if(existingUser != null) {
+            log.info("User is presented for updating");
+            existingUser.setName(userInfo.getName());
+            existingUser.setAge(userInfo.getAge());
+            existingUser.setRole(userInfo.getRole());
+            existingUser.setPassword(encoder.encode(userInfo.getPassword()));
+            return UserMapper.toResponse(userRepository.save(existingUser));
+        }
+        else {
+            log.info("User is not presented in the db, so the user is added as new user");
+            userInfo.setPassword(encoder.encode(userInfo.getPassword()));
+            userInfo.setIsActive(true);
+            return UserMapper.toResponse(userRepository.save(userInfo));
+        }
+
+    }
+
+    @Override
+    public void deleteUserById(Integer id) {
+        Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);
+        if(userInfo.isPresent()) {
+            log.warn("User with id({}) is deleted", id);
+            userInfo.get().setIsActive(false);
+            userRepository.save(userInfo.get());
+        } else {
+            log.warn("There is no user with a id({}) to delete", id);
+            throw new UsernameNotFoundException("User not found with id: " + id);
+        }
+    }
+
+    private UserInfo findByEmail(String email){
+        Optional<UserInfo> existingUser = userRepository.findByEmailAndIsActive(email, true);
+        return existingUser.orElse(null);
+    }
+
+}
