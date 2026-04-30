@@ -75,13 +75,13 @@ public class UserService implements IUserService {
         Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);
         if(userInfo.isPresent()){
             UserInfo user = userInfo.get();
-            if(user.getName() != null)
+            if(userPatchDto.name() != null)
                 user.setName(userPatchDto.name());
-            if(user.getAge() != null)
+            if(userPatchDto.age() != null)
                 user.setAge(userPatchDto.age());
-            if(user.getIsActive() != null)
+            if(userPatchDto.isActive() != null)
                 user.setIsActive(userPatchDto.isActive());
-            if(user.getRole() != null)
+            if(userPatchDto.role() != null)
                 user.setRole(userPatchDto.role());
             return UserMapper.toResponse(userRepository.save(user));
         } else
