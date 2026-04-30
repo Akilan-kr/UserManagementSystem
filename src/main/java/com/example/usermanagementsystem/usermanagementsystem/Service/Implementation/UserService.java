@@ -1,6 +1,6 @@
 package com.example.usermanagementsystem.usermanagementsystem.Service.Implementation;
 
-import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserNameUpdateDto;
+import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserPatchDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserRequestDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.UserResponseDto;
 import com.example.usermanagementsystem.usermanagementsystem.Entity.UserInfo;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -72,11 +71,18 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public UserResponseDto updateName(UserNameUpdateDto userNameUpdateDto, Integer id) {
+    public UserResponseDto patchUser(UserPatchDto userPatchDto, Integer id) {
         Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);
         if(userInfo.isPresent()){
             UserInfo user = userInfo.get();
-            user.setName(userNameUpdateDto.name());
+            if(user.getName() != null)
+                user.setName(userPatchDto.name());
+            if(user.getAge() != null)
+                user.setAge(userPatchDto.age());
+            if(user.getIsActive() != null)
+                user.setIsActive(userPatchDto.isActive());
+            if(user.getRole() != null)
+                user.setRole(userPatchDto.role());
             return UserMapper.toResponse(userRepository.save(user));
         } else
             throw new UsernameNotFoundException("User with id:"+id+"Not founded");

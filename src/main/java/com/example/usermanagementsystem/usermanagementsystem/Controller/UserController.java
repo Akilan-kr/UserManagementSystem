@@ -1,6 +1,6 @@
 package com.example.usermanagementsystem.usermanagementsystem.Controller;
 
-import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserNameUpdateDto;
+import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserPatchDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserRequestDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.ApiResponse;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.UserResponseDto;
@@ -110,7 +110,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/update/{id}")
-    public ResponseEntity<ApiResponse<?>> patchUser(@PathVariable Integer id, @RequestBody UserNameUpdateDto userNameUpdateDto){
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userService.updateName(userNameUpdateDto, id), "Successfully patched", true));
+    public ResponseEntity<ApiResponse<?>> patchUser(@PathVariable Integer id, @RequestBody UserPatchDto userPatchDto){
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userService.patchUser(userPatchDto, id), "Successfully patched", true));
     }
 }

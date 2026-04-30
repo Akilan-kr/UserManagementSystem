@@ -68,12 +68,6 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, ex.getMessage() + ", Check the API and Request Method Correctly", false));
     }
 
-    @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<ApiResponse<?>> handleExpiredToken(ExpiredJwtException ex){
-        log.error((ex.getLocalizedMessage()));
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, ex.getMessage(), false));
-    }
-
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<?>> handleForbidden(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse<>(null, ex.getMessage()+", you dont have access to the method",false));
