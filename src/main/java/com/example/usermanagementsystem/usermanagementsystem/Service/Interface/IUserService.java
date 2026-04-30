@@ -2,6 +2,7 @@ package com.example.usermanagementsystem.usermanagementsystem.Service.Interface;
 
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserPatchDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserRequestDto;
+import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.PageResponse;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.UserResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,7 @@ public interface IUserService {
 
     UserResponseDto createUser(UserRequestDto userRequestDto);
 
-    Page<UserResponseDto> getAllUsers(Pageable pageable, String search);
+    PageResponse<UserResponseDto> getAllUsers(Pageable pageable, String search);
 
     UserResponseDto getUserById(Integer id);
 

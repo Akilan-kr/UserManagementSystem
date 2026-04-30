@@ -3,6 +3,7 @@ package com.example.usermanagementsystem.usermanagementsystem.Controller;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserPatchDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserRequestDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.ApiResponse;
+import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.PageResponse;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.UserResponseDto;
 import com.example.usermanagementsystem.usermanagementsystem.Service.CommonUtils;
 import com.example.usermanagementsystem.usermanagementsystem.Service.Interface.IUserService;
@@ -63,16 +64,20 @@ public class UserController {
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/getAll")
-    public ResponseEntity<ApiResponse<Page<UserResponseDto>>> getAllUsers(
-            @RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<ApiResponse<PageResponse<UserResponseDto>>> getAllUsers(
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "true") boolean ascending) {
         log.info("/getAll API endpoint called");
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userService.getAllUsers(pageable, name),"Successfully Get all the user", true ));
+        Pageable pageable = PageRequest.of((page <= 0) ? 0 : page - 1, size, sort);
+        PageResponse<UserResponseDto> pagedUserResponse = userService.getAllUsers(pageable, name);
+        if(!(pagedUserResponse.content().isEmpty()))
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(pagedUserResponse,"Successfully Get all the user", true ));
+        else
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(pagedUserResponse,"No Users in the list", true ));
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
@@ -82,7 +87,7 @@ public class UserController {
             log.info("/get/id API endpoint called for a id:{}", id);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userService.getUserById(id),"Successfully Get a particular user",true));
         } catch(UsernameNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, "User not Found with id"+id, false));
         }
     }
 

@@ -18,6 +18,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.SignatureException;
+
 @Slf4j
 @Configuration
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -60,9 +62,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-            response.getWriter().write("{\"error\":\"TOKEN_EXPIRED\"}");
+            response.getWriter().write("{\"data\": null,\"message\":\"Token Expired\",\"isSuccess\": false}");
             return;
         }
+
         filterChain.doFilter(request, response);
 
     }

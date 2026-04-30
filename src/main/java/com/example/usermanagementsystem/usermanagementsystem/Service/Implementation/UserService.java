@@ -2,6 +2,7 @@ package com.example.usermanagementsystem.usermanagementsystem.Service.Implementa
 
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserPatchDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO.UserRequestDto;
+import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.PageResponse;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.UserResponseDto;
 import com.example.usermanagementsystem.usermanagementsystem.Entity.UserInfo;
 import com.example.usermanagementsystem.usermanagementsystem.Exception.PartialUserAlreadyAvailable;
@@ -89,11 +90,12 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Page<UserResponseDto> getAllUsers(Pageable pageable, String search) {
+    public PageResponse<UserResponseDto> getAllUsers(Pageable pageable, String search) {
         log.info("Getting All Users");
         Page<UserInfo> userInfos = userRepository.findByNameContainingIgnoreCaseAndIsActive(pageable, search, true);
-        return userInfos.map(UserMapper::toResponse);
+        return UserMapper.toPageResponse(userInfos.map(UserMapper::toResponse));
     }
+
 
     //TODO
     @Override
