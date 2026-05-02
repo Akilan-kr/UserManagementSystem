@@ -2,6 +2,8 @@ package com.example.usermanagementsystem.usermanagementsystem.Entity;
 
 import com.example.usermanagementsystem.usermanagementsystem.Enums.Roles;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -25,6 +27,10 @@ public class UserInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @NotBlank(message = "User Name Cannot be null or empty")
+    @Pattern(
+            regexp = "^[a-zA-Z ]+$",
+            message = "Name should only contains Upper Case, Lower Case, Space"
+    )
     private String name;
     @NotBlank(message = "Email Cannot be null or empty")
     @Pattern(
@@ -32,6 +38,9 @@ public class UserInfo {
             message = "Email format is invalid (e.g., example@domain.com)"
     )
     private String email;
+    @NotBlank(message = "Age Cannot be null or Empty")
+    @Min(value = 18)
+    @Max(value = 80)
     private Integer age;
     @NotBlank(message = "Password Cannot be null or Empty")
     @Pattern(

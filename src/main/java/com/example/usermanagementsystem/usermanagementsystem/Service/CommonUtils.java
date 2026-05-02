@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
 
-@Service
+//@Service
 public class CommonUtils {
 
     private static final String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";

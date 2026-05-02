@@ -37,29 +37,15 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBody UserRequestDto userRequestDto){
-        if (commonUtils.validAge(userRequestDto.age()) && commonUtils.validEmail(userRequestDto.email())) {
-              log.info("/create API endpoint called");
-              return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(userService.createUser(userRequestDto), "Successfully Created", true));
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(null,"Bad Request check the Request object", false));
-        }
+          log.info("/create API endpoint called");
+          return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(userService.createUser(userRequestDto), "Successfully Created", true));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create/bulkUser")
     public ResponseEntity<ApiResponse<List<UserResponseDto>>> createBulkUser(@Valid @RequestBody List<UserRequestDto> listOfUserRequestDto){
-        boolean valid = true;
-        for(UserRequestDto userRequestDto: listOfUserRequestDto){
-            if(!(commonUtils.validEmail(userRequestDto.email()) && commonUtils.validAge(userRequestDto.age()))) {
-                valid = false;
-                break;
-            }
-        }
-        if(valid) {
             log.info("/create/bulkuser API endpoint called");
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userService.CreateBulkUser(listOfUserRequestDto), "Successfully Created Bulk users", true));
-        } else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(null,"Bad Request check the Request object", false));
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")

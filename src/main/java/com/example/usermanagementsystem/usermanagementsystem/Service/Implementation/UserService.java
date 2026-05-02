@@ -17,9 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -50,6 +48,7 @@ public class UserService implements IUserService {
 
     @Override
     public List<UserResponseDto> CreateBulkUser(List<UserRequestDto> listOfUserRequestDto) {
+        validateDuplicateEmailInTheList(listOfUserRequestDto);
         List<String> duplicateEmails = new ArrayList<>();
         List<UserInfo> validUsers = new ArrayList<>();
         List<UserInfo> userInfos = listOfUserRequestDto.stream().map(UserMapper::toEntity).toList();
@@ -71,6 +70,15 @@ public class UserService implements IUserService {
             throw new PartialUserAlreadyAvailable("Partial update: Some Email in the List is already available", duplicateEmails);
     }
 
+    private void validateDuplicateEmailInTheList(List<UserRequestDto> listOfUserRequestDto) {
+        Set<String> emails = new HashSet<>();
+        for(UserRequestDto userRequestDto: listOfUserRequestDto){
+            if(!(emails.add(userRequestDto.email()))){
+                throw new UserAlreadyAvailable("The List contains duplicate Emails Id, Email should be unique");
+            }
+        }
+    }
+
     @Override
     public UserResponseDto patchUser(UserPatchDto userPatchDto, Integer id) {
         Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);
@@ -80,8 +88,8 @@ public class UserService implements IUserService {
                 user.setName(userPatchDto.name());
             if(userPatchDto.age() != null)
                 user.setAge(userPatchDto.age());
-            if(userPatchDto.isActive() != null)
-                user.setIsActive(userPatchDto.isActive());
+            if(userPatchDto.email() != null)
+                user.setEmail(userPatchDto.email());
             if(userPatchDto.role() != null)
                 user.setRole(userPatchDto.role());
             return UserMapper.toResponse(userRepository.save(user));
@@ -97,7 +105,6 @@ public class UserService implements IUserService {
     }
 
 
-    //TODO
     @Override
     public UserResponseDto getUserById(Integer id) {
             log.info("Getting user based on id({})", id);
