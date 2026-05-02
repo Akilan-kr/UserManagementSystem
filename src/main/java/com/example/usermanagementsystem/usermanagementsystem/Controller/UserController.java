@@ -27,11 +27,9 @@ import java.util.List;
 public class UserController {
 
     private final IUserService userService;
-    private final CommonUtils commonUtils;
 
-    public UserController(IUserService userService, CommonUtils commonUtils) {
+    public UserController(IUserService userService) {
         this.userService = userService;
-        this.commonUtils = commonUtils;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -45,7 +43,7 @@ public class UserController {
     @PostMapping("/create/bulkUser")
     public ResponseEntity<ApiResponse<List<UserResponseDto>>> createBulkUser(@Valid @RequestBody List<UserRequestDto> listOfUserRequestDto){
             log.info("/create/bulkuser API endpoint called");
-            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userService.CreateBulkUser(listOfUserRequestDto), "Successfully Created Bulk users", true));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userService.createBulkUser(listOfUserRequestDto), "Successfully Created Bulk users", true));
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
@@ -58,7 +56,7 @@ public class UserController {
             @RequestParam(defaultValue = "true") boolean ascending) {
         log.info("/getAll API endpoint called");
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of((page <= 0) ? 0 : page - 1, size, sort);
+        Pageable pageable = PageRequest.of((page <= 0) ? 0 : page - 1, size <= 0 ? 5 : size , sort);
         PageResponse<UserResponseDto> pagedUserResponse = userService.getAllUsers(pageable, name);
         if(!(pagedUserResponse.content().isEmpty()))
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(pagedUserResponse,"Successfully Get all the user", true ));
@@ -80,11 +78,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update")
     public ResponseEntity<ApiResponse<UserResponseDto>> updateUser(@Valid @RequestBody UserRequestDto userRequestDto){
-        if(commonUtils.validAge(userRequestDto.age()) && commonUtils.validEmail(userRequestDto.email())) {
             log.info("/update API endpoint called");
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userService.updateUser(userRequestDto), "Updated Successfully", true));
-        } else
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(null,"Bad Request check the Request object", false));
     }
 
     @PreAuthorize("hasRole('ADMIN')")

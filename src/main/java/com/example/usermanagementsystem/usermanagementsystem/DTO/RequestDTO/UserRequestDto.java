@@ -17,7 +17,6 @@ public record UserRequestDto(
         String name,
         @NotBlank(message = "Email cannot be null or Empty")
         String email,
-        @NotBlank(message = "Age Cannot be null or Empty")
         @Min(value = 18)
         @Max(value = 80)
         Integer age,

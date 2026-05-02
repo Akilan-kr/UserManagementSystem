@@ -47,7 +47,7 @@ public class UserService implements IUserService {
 
 
     @Override
-    public List<UserResponseDto> CreateBulkUser(List<UserRequestDto> listOfUserRequestDto) {
+    public List<UserResponseDto> createBulkUser(List<UserRequestDto> listOfUserRequestDto) {
         validateDuplicateEmailInTheList(listOfUserRequestDto);
         List<String> duplicateEmails = new ArrayList<>();
         List<UserInfo> validUsers = new ArrayList<>();
@@ -94,7 +94,7 @@ public class UserService implements IUserService {
                 user.setRole(userPatchDto.role());
             return UserMapper.toResponse(userRepository.save(user));
         } else
-            throw new UsernameNotFoundException("User with id:"+id+"Not founded");
+            throw new UsernameNotFoundException("User not found with id: "+id);
     }
 
     @Override

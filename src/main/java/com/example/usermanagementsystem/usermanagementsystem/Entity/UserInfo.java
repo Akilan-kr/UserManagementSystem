@@ -38,7 +38,6 @@ public class UserInfo {
             message = "Email format is invalid (e.g., example@domain.com)"
     )
     private String email;
-    @NotBlank(message = "Age Cannot be null or Empty")
     @Min(value = 18)
     @Max(value = 80)
     private Integer age;

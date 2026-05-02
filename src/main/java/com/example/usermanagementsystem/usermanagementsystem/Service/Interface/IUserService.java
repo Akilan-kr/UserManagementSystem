@@ -21,7 +21,7 @@ public interface IUserService {
 
     void deleteUserById(Integer id);
 
-    List<UserResponseDto> CreateBulkUser(List<UserRequestDto> listOfUserRequestDto);
+    List<UserResponseDto> createBulkUser(List<UserRequestDto> listOfUserRequestDto);
 
     UserResponseDto patchUser(UserPatchDto userPatchDto, Integer id);
 }

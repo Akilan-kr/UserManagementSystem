@@ -2,6 +2,7 @@ package com.example.usermanagementsystem.usermanagementsystem.Exception;
 
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.ApiResponse;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,8 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Map;
 import java.util.Objects;
@@ -26,16 +29,16 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(null, ex.getMessage(), false));
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ApiResponse<?>> handleUserNotFound(UsernameNotFoundException ex){
-        log.error(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, ex.getMessage(), false));
-    }
-
     @ExceptionHandler(NotValidEmailException.class)
     public ResponseEntity<ApiResponse<?>> handleEmailValidation(NotValidEmailException ex){
         log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(null, ex.getMessage(), false));
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleUserNotFound(UsernameNotFoundException ex){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, ex.getMessage(), false));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -65,11 +68,30 @@ public class GlobalException {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiResponse<?>> handleInvalidApiMethod(HttpRequestMethodNotSupportedException ex){
         log.error((ex.getMessage()));
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>(null, ex.getMessage() + ", Check the API and Request Method Correctly", false));
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(new ApiResponse<>(null, ex.getMessage() + ", Check the API and Request Method Correctly", false));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiResponse<?>> handleForbidden(AccessDeniedException ex) {
+        log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse<>(null, ex.getMessage()+", you dont have access to the method",false));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponse<?>> handleMethodParameterMismatch(MethodArgumentTypeMismatchException ex){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(null, ex.getMessage(),false));
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleNoHandleMethodForApi(NoHandlerFoundException ex){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, ex.getMessage(),false));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<?>> handleConstraintInRecordAndEntity(ConstraintViolationException ex){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(null, ex.getMessage(),false));
     }
 }
