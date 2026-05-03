@@ -89,7 +89,8 @@ public class UserService implements IUserService {
             if(userPatchDto.age() != null)
                 user.setAge(userPatchDto.age());
             if(userPatchDto.email() != null)
-                user.setEmail(userPatchDto.email());
+                if(findByEmail(userPatchDto.email()) == null) user.setEmail(userPatchDto.email());
+                else throw new UserAlreadyAvailable("User with this email is already available");
             if(userPatchDto.role() != null)
                 user.setRole(userPatchDto.role());
             return UserMapper.toResponse(userRepository.save(user));

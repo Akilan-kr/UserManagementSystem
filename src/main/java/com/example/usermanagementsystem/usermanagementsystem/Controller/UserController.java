@@ -88,7 +88,8 @@ public class UserController {
         try {
             log.info("/delete/id API endpoint is called for id:{}", id);
             userService.deleteUserById(id);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>(null,"Data Deleted Successfully", true));
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(null,"Data Deleted Successfully", true));
+//            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ApiResponse<>(null,"Data Deleted Successfully", true));
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, "No Data Founded with that ID",false));
         }

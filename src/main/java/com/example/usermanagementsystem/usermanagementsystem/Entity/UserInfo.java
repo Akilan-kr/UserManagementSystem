@@ -2,10 +2,7 @@ package com.example.usermanagementsystem.usermanagementsystem.Entity;
 
 import com.example.usermanagementsystem.usermanagementsystem.Enums.Roles;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -38,6 +35,7 @@ public class UserInfo {
             message = "Email format is invalid (e.g., example@domain.com)"
     )
     private String email;
+    @NotNull(message = "Age cannot be null")
     @Min(value = 18)
     @Max(value = 80)
     private Integer age;

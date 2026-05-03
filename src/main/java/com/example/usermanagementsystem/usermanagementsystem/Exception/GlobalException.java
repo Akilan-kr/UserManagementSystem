@@ -1,7 +1,6 @@
 package com.example.usermanagementsystem.usermanagementsystem.Exception;
 
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.ApiResponse;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

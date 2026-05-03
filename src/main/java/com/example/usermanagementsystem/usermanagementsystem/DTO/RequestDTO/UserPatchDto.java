@@ -1,10 +1,7 @@
 package com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO;
 
 import com.example.usermanagementsystem.usermanagementsystem.Enums.Roles;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 
 public record UserPatchDto(
         @Pattern(
@@ -12,6 +9,7 @@ public record UserPatchDto(
                 message = "Name should only contains Upper Case, Lower Case, Space"
         )
         String name,
+        @NotNull(message = "Age cannot be null")
         @Min(value = 18)
         @Max(value = 80)
         Integer age,
