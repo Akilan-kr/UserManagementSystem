@@ -3,6 +3,7 @@ package com.example.usermanagementsystem.usermanagementsystem.Exception;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -93,4 +94,11 @@ public class GlobalException {
         log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(null, ex.getMessage(),false));
     }
+
+    @ExceptionHandler(PropertyReferenceException.class)//for getall parameter value mismatch
+    public ResponseEntity<ApiResponse<?>> handleParameterProperty(PropertyReferenceException ex){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(null, ex.getMessage(),false));
+    }
+
 }
