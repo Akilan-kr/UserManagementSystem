@@ -48,8 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 token = authHeader.substring(7);
                 username = jwtService.extractUsername(token);
-            } else
-                throw new AccessDeniedException("Token is missing");
+            }
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
@@ -60,22 +59,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException e) {
-
             log.warn("JWT expired: {}", e.getMessage());
-
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
             response.getWriter().write("{\"data\": null,\"message\":\"Token Expired\",\"isSuccess\": false}");
             return;
-        } catch (AccessDeniedException ex) {
-            log.warn("JWT is missing: {}", ex.getMessage());
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"data\": null,\"message\":\""+ex.getMessage()+"\",\"isSuccess\": false}");
-            return;
-        }
-        catch (RuntimeException ex){
+        } catch (RuntimeException ex){
             log.warn(ex.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");

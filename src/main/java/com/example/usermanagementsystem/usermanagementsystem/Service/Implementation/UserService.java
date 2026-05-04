@@ -36,7 +36,6 @@ public class UserService implements IUserService {
         this.encoder = encoder;
     }
 
-    @CachePut(value = "users", key = "#user.id")
     @Override
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         if(findByEmail(userRequestDto.email()) == null) {

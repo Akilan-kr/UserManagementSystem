@@ -6,6 +6,7 @@ import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.Api
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.OrderResponseDto;
 import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.PageResponse;
 import com.example.usermanagementsystem.usermanagementsystem.Entity.Order;
+import com.example.usermanagementsystem.usermanagementsystem.Exception.OrderNotFoundException;
 import com.example.usermanagementsystem.usermanagementsystem.Service.Interface.IOrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,5 +63,16 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(pageOrderResponse, "Successfully got all the Order", true));
         else
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(pageOrderResponse, "No Orders In the list", true));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/deleteOrder/{id}")
+    public ResponseEntity<ApiResponse<?>> deleteOrderById(@PathVariable Integer id){
+        try{
+            orderService.deleteOrderById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(null, "Order Deleted Successfully", true));
+        } catch (OrderNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, "No Order Founded with that ID", false));
+        }
     }
 }

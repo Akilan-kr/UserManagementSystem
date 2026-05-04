@@ -38,5 +38,5 @@ public class Order {
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
+    private Boolean isActive;
 }

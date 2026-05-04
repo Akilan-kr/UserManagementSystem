@@ -41,6 +41,12 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, ex.getMessage(), false));
     }
 
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleOrderNotFound(OrderNotFoundException ex){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, ex.getMessage(), false));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleRequestObjectValidation(MethodArgumentNotValidException ex){
         log.error(ex.getMessage());

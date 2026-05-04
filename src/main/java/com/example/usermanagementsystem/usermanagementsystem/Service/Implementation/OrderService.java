@@ -6,6 +6,7 @@ import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.Pag
 import com.example.usermanagementsystem.usermanagementsystem.Entity.Order;
 import com.example.usermanagementsystem.usermanagementsystem.Entity.UserInfo;
 import com.example.usermanagementsystem.usermanagementsystem.Enums.OrderStatus;
+import com.example.usermanagementsystem.usermanagementsystem.Exception.OrderNotFoundException;
 import com.example.usermanagementsystem.usermanagementsystem.Mapper.OrderMapper;
 import com.example.usermanagementsystem.usermanagementsystem.Repository.OrderRepository;
 import com.example.usermanagementsystem.usermanagementsystem.Repository.UserRepository;
@@ -43,6 +44,7 @@ public class OrderService implements IOrderService {
             log.info("creating the order for the user");
             Order order = OrderMapper.toEntity(orderRequestDto);
             order.setOrderStatus(OrderStatus.PENDING);
+            order.setIsActive(true);
             Optional<UserInfo> user = userRepository.findByEmailAndIsActive(loginUserEmail, true);
             if (user.isPresent()) {
                 order.setUser(user.get());
@@ -85,7 +87,18 @@ public class OrderService implements IOrderService {
     public PageResponse<OrderResponseDto> getAllOrders(Integer page, Integer size, Boolean ascending, String sortBy) {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of((page <= 0) ? 0 : page - 1, size <= 0 ? 5 : size , sort);
-        Page<Order> orderPage = orderRepository.findAll(pageable);
+        Page<Order> orderPage = orderRepository.findByIsActive(pageable, true);
         return OrderMapper.toPageResponse(orderPage.map(OrderMapper::toResponse));
+    }
+
+    @Override
+    public void deleteOrderById(Integer id) {
+        Optional<Order> order = orderRepository.findById(id);
+        if(order.isPresent()) {
+            order.get().setIsActive(false);
+            orderRepository.save(order.get());
+        }
+        else
+            throw new OrderNotFoundException("No Order Found with id: "+id);
     }
 }

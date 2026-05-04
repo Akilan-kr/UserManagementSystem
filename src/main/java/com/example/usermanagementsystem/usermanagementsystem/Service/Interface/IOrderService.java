@@ -17,4 +17,5 @@ public interface IOrderService {
 
     PageResponse<OrderResponseDto> getAllOrders(Integer page, Integer size, Boolean ascending, String sortBy);
 
+    void deleteOrderById(Integer id);
 }
