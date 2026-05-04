@@ -55,9 +55,7 @@ public class UserController {
             @RequestParam(defaultValue = "") String name,
             @RequestParam(defaultValue = "true") boolean ascending) {
         log.info("/getAll API endpoint called");
-        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of((page <= 0) ? 0 : page - 1, size <= 0 ? 5 : size , sort);
-        PageResponse<UserResponseDto> pagedUserResponse = userService.getAllUsers(pageable, name);
+        PageResponse<UserResponseDto> pagedUserResponse = userService.getAllUsers((page <= 0) ? 0 : page - 1, (size <= 0) ? 5 : size , sortBy,  ascending, name);
         if(!(pagedUserResponse.content().isEmpty()))
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(pagedUserResponse,"Successfully Get all the user", true ));
         else

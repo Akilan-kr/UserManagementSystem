@@ -4,7 +4,6 @@ import com.example.usermanagementsystem.usermanagementsystem.Enums.Roles;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 
-@Builder
 public record UserRequestDto(
         @NotBlank(message = "UserName cannot be null or Empty")
         @Pattern(

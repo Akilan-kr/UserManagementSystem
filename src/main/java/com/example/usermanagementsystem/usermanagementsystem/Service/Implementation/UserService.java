@@ -11,8 +11,13 @@ import com.example.usermanagementsystem.usermanagementsystem.Mapper.UserMapper;
 import com.example.usermanagementsystem.usermanagementsystem.Repository.UserRepository;
 import com.example.usermanagementsystem.usermanagementsystem.Service.Interface.IUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,7 +36,7 @@ public class UserService implements IUserService {
         this.encoder = encoder;
     }
 
-
+    @CachePut(value = "users", key = "#user.id")
     @Override
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         if(findByEmail(userRequestDto.email()) == null) {
@@ -98,14 +103,18 @@ public class UserService implements IUserService {
             throw new UsernameNotFoundException("User not found with id: "+id);
     }
 
+    @Cacheable(value = "allUsers" , key = "#page + '_' + #size +  '_' + #ascending + '_' + #sortBy + '_' + #search" )
     @Override
-    public PageResponse<UserResponseDto> getAllUsers(Pageable pageable, String search) {
+    public PageResponse<UserResponseDto> getAllUsers(Integer page, Integer size, String sortBy, Boolean ascending, String search) {
         log.info("Getting All Users");
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of((page <= 0) ? 0 : page - 1, size <= 0 ? 5 : size , sort);
         Page<UserInfo> userInfos = userRepository.findByNameContainingIgnoreCaseAndIsActive(pageable, search, true);
         return UserMapper.toPageResponse(userInfos.map(UserMapper::toResponse));
     }
 
 
+    @Cacheable(value = "users", key = "#id")
     @Override
     public UserResponseDto getUserById(Integer id) {
             log.info("Getting user based on id({})", id);
@@ -142,6 +151,7 @@ public class UserService implements IUserService {
 
     }
 
+    @CacheEvict(value = "users", key = "#id")
     @Override
     public void deleteUserById(Integer id) {
         Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);
