@@ -112,20 +112,15 @@ public class OrderService implements IOrderService {
     @Override
     public void cancelOrderById(Integer id) {
         String loginUserEmail = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-            Optional<UserInfo> user = userRepository.findByEmailAndIsActive(loginUserEmail, true);
-            if(user.isPresent()){
-                Optional<Order> order = orderRepository.findByIdAndIsActiveTrue(id);
-                if(order.isPresent()){
-                    Order availableOrder = order.get();
-                    if(availableOrder.getUser().getId().equals(user.get().getId())){
-                        if(OrderStatus.PENDING.equals(availableOrder.getOrderStatus())) {
-                            log.info("Order({}) was cancel by the user({})", id, loginUserEmail);
-                            availableOrder.setOrderStatus(OrderStatus.CANCELLED);
-                            orderRepository.save(availableOrder);
-                        } else throw new OrderNotFoundException("You cannot Cancel the order which is Completed");
-                    } else throw new OrderNotFoundException("You cannot Change the order status which is not belong to you");
-                } else throw new OrderNotFoundException("Order Not found with id:"+id);
-            } else throw new UsernameNotFoundException("User not found with the email"+ loginUserEmail);
+        UserInfo user = userRepository.findByEmailAndIsActive(loginUserEmail, true).orElseThrow(()-> new UsernameNotFoundException("User not found with the email"+ loginUserEmail));
+        Order order = orderRepository.findByIdAndIsActiveTrue(id).orElseThrow(() -> new OrderNotFoundException("Order Not found with id:"+id));
+        if(order.getUser().getId().equals(user.getId())){
+            if(OrderStatus.PENDING.equals(order.getOrderStatus())) {
+                log.info("Order({}) was cancel by the user({})", id, loginUserEmail);
+                order.setOrderStatus(OrderStatus.CANCELLED);
+                orderRepository.save(order);
+            } else throw new OrderNotFoundException("You cannot Cancel the order which is Completed");
+        } else throw new OrderNotFoundException("You cannot Change the order status which is not belong to you");
     }
 
     @Override

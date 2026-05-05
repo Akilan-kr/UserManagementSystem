@@ -86,7 +86,7 @@ public class UserService implements IUserService {
         }
     }
 
-    @CacheEvict(value = "users", key = "#id")
+    @CachePut(value = "users", key = "#id")
     @Override
     public UserResponseDto patchUser(UserPatchDto userPatchDto, Integer id) {
         Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);
