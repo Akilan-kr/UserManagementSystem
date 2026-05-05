@@ -12,7 +12,12 @@ import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
-    List<Order> findAllByUserId(Integer id);
-
     Page<Order> findByIsActive(Pageable pageable, boolean isActive);
+
+    List<Order> findAllByUserIdAndIsActiveTrue(Integer id);
+
+    Optional<Order> findByIdAndIsActiveTrue(Integer id);
+
+    Page<Order> findByProductNameContainingIgnoreCaseAndIsActiveTrue(Pageable pageable, String search);
 }
+

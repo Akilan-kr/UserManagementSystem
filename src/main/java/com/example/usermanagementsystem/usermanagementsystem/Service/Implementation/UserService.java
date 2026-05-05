@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -69,9 +70,11 @@ public class UserService implements IUserService {
             return userRepository.saveAll(validUsers).stream().map(UserMapper::toResponse).toList();
         else if(duplicateEmails.size() == userInfos.size())
             throw new UserAlreadyAvailable("All the Emails in the List Request is already Available");
-        else
+        else {
+            log.info("Partial creation: Some ");
             userRepository.saveAll(validUsers);
             throw new PartialUserAlreadyAvailable("Partial update: Some Email in the List is already available", duplicateEmails);
+        }
     }
 
     private void validateDuplicateEmailInTheList(List<UserRequestDto> listOfUserRequestDto) {
@@ -83,6 +86,7 @@ public class UserService implements IUserService {
         }
     }
 
+    @CacheEvict(value = "users", key = "#id")
     @Override
     public UserResponseDto patchUser(UserPatchDto userPatchDto, Integer id) {
         Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);
@@ -149,8 +153,10 @@ public class UserService implements IUserService {
         }
 
     }
-
-    @CacheEvict(value = "users", key = "#id")
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#id"),
+            @CacheEvict(value = "orders", key = "#id")
+    })
     @Override
     public void deleteUserById(Integer id) {
         Optional<UserInfo> userInfo = userRepository.findByIdAndIsActive(id, true);

@@ -1,15 +1,12 @@
 package com.example.usermanagementsystem.usermanagementsystem.DTO.RequestDTO;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.example.usermanagementsystem.usermanagementsystem.Enums.OrderStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Builder;
 
-public record OrderRequestDto(
-        @NotBlank(message = "Product name cannot be null or Empty")
+public record OrderPatchDto(
         @Pattern(
                 regexp = "^[a-zA-Z ]+$",
                 message = "Name should only contains Upper Case, Lower Case, Space"
@@ -17,6 +14,8 @@ public record OrderRequestDto(
         String productName,
         @NotNull(message = "Amount cannot be null")
         @Min(value = 0)
-        Integer amount
+        Integer amount,
+        Boolean isActive,
+        OrderStatus orderStatus
 ) {
 }

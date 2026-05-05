@@ -35,7 +35,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<UserResponseDto>> createUser(@Valid @RequestBody UserRequestDto userRequestDto){
-          log.info("/create API endpoint called");
+          log.info("user/create API endpoint called");
           return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(userService.createUser(userRequestDto), "Successfully Created", true));
     }
 
