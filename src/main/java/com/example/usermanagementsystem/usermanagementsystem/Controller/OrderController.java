@@ -75,11 +75,11 @@ public class OrderController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/deleteOrder/{id}")
-    public ResponseEntity<ApiResponse<?>> deleteOrderById(@PathVariable Integer id){
-        log.info("/deleteOrder/id API endpoint called for the order id: {}", id);
+    @DeleteMapping("/deleteOrder/{orderId}")
+    public ResponseEntity<ApiResponse<?>> deleteOrderById(@PathVariable String orderId){
+        log.info("/deleteOrder/id API endpoint called for the order id: {}", orderId);
         try{
-            orderService.deleteOrderById(id);
+            orderService.deleteOrderByOrderId(orderId);
             return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(null, "Order Deleted Successfully", true));
         } catch (OrderNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, "No Order Founded with that ID", false));
@@ -87,17 +87,17 @@ public class OrderController {
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    @PostMapping("/cancel/{id}")
-    public ResponseEntity<ApiResponse<?>> cancelOrderById(@PathVariable Integer id){
-        log.info("/cancel/id API endpoint called for the order id: {}", id);
-        orderService.cancelOrderById(id);
+    @PostMapping("/cancel/{orderId}")
+    public ResponseEntity<ApiResponse<?>> cancelOrderById(@PathVariable String orderId){
+        log.info("/cancel/id API endpoint called for the order id: {}", orderId);
+        orderService.cancelOrderByOrderId(orderId);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(null, "Order Cancelled", true));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<ApiResponse<OrderResponseDto>> patchOrderById(@PathVariable Integer id, @RequestBody OrderPatchDto orderPatchDto){
-        log.info("/update/id API endpoint called for the order id: {}", id);
-        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(orderService.patchOrderById(orderPatchDto, id), "Order Updated Successfully", true));
+    @PatchMapping("/update/{orderId}")
+    public ResponseEntity<ApiResponse<OrderResponseDto>> patchOrderById(@PathVariable String orderId, @RequestBody OrderPatchDto orderPatchDto){
+        log.info("/update/id API endpoint called for the order id: {}", orderId);
+        return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(orderService.patchOrderById(orderPatchDto, orderId), "Order Updated Successfully", true));
     }
 }

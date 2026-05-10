@@ -7,6 +7,7 @@ import com.example.usermanagementsystem.usermanagementsystem.DTO.ResponseDTO.Use
 import com.example.usermanagementsystem.usermanagementsystem.Entity.UserInfo;
 import com.example.usermanagementsystem.usermanagementsystem.Exception.PartialUserAlreadyAvailable;
 import com.example.usermanagementsystem.usermanagementsystem.Exception.UserAlreadyAvailable;
+import com.example.usermanagementsystem.usermanagementsystem.Mapper.PageMapper;
 import com.example.usermanagementsystem.usermanagementsystem.Mapper.UserMapper;
 import com.example.usermanagementsystem.usermanagementsystem.Repository.UserRepository;
 import com.example.usermanagementsystem.usermanagementsystem.Service.Interface.IUserService;
@@ -113,7 +114,7 @@ public class UserService implements IUserService {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of((page <= 0) ? 0 : page - 1, size <= 0 ? 5 : size , sort);
         Page<UserInfo> userInfos = userRepository.findByNameContainingIgnoreCaseAndIsActive(pageable, search, true);
-        return UserMapper.toPageResponse(userInfos.map(UserMapper::toResponse));
+        return PageMapper.toPageResponse(userInfos.map(UserMapper::toResponse));
     }
 
 

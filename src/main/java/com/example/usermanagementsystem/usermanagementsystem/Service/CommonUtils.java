@@ -2,11 +2,13 @@ package com.example.usermanagementsystem.usermanagementsystem.Service;
 
 import com.example.usermanagementsystem.usermanagementsystem.Exception.NotValidAgeException;
 import com.example.usermanagementsystem.usermanagementsystem.Exception.NotValidEmailException;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
-//@Service
+@Service
 public class CommonUtils {
 
     private static final String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
@@ -30,5 +32,9 @@ public class CommonUtils {
         return Pattern.compile(emailRegex)
                 .matcher(email)
                 .matches();
+    }
+
+    public @NotBlank(message = "OrderId Cannot be null or blank") String generateOrderId() {
+        return "ORD-ID-"+UUID.randomUUID().toString().substring(0,5).toUpperCase();
     }
 }

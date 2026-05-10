@@ -16,8 +16,9 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
     List<Order> findAllByUserIdAndIsActiveTrue(Integer id);
 
-    Optional<Order> findByIdAndIsActiveTrue(Integer id);
+    Page<Order> findByAndIsActiveTrue(Pageable pageable, String search);
 
-    Page<Order> findByProductNameContainingIgnoreCaseAndIsActiveTrue(Pageable pageable, String search);
+    Optional<Order> findByOrderIdAndIsActiveTrue(String orderId);
+
 }
 

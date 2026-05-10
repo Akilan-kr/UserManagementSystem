@@ -47,6 +47,18 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, ex.getMessage(), false));
     }
 
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ApiResponse<?>> handleProductNotFound(ProductNotFoundException ex){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(null, ex.getMessage(), false));
+    }
+
+    @ExceptionHandler(ExceedingStockCountException.class)// status code: 422
+    public ResponseEntity<ApiResponse<?>> handleProductNotFound(ExceedingStockCountException ex){
+        log.error(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(new ApiResponse<>(null, ex.getMessage(), false));
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleRequestObjectValidation(MethodArgumentNotValidException ex){
         log.error(ex.getMessage());

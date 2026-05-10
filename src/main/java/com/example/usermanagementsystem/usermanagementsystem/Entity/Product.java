@@ -1,12 +1,10 @@
 package com.example.usermanagementsystem.usermanagementsystem.Entity;
 
-import com.example.usermanagementsystem.usermanagementsystem.Enums.OrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -22,28 +20,27 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity(name = "order_table")
+@Entity(name = "product_table")
 @EntityListeners(AuditingEntityListener.class)
-public class Order {
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @ManyToOne()
-    @JoinColumn(name = "user_table_id")
-    private UserInfo user;
-    @ManyToOne
-    @JoinColumn(name = "product_table_id")
-    private Product product;
-    @NotBlank(message = "OrderId Cannot be null or blank")
-    private String orderId;
-    @Min(value = 1)
-    private Integer quantity;
-    private Integer totalAmount;
-    private OrderStatus orderStatus;
+    @NotBlank(message = "Product name cannot be null or Empty")
+    private String productName;
+    @NotNull(message = "Price cannot be null")
+    @Min(value = 0)
+    private Integer price;
+    @NotNull(message = "Stock cannot be null")
+    @Min(value = 0)
+    private Integer availableStock;
+    private Boolean isActive;
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
     @LastModifiedDate
     private LocalDateTime updatedAt;
-    private Boolean isActive;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> order = new ArrayList<>();
 }

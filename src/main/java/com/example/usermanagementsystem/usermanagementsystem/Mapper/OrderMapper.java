@@ -10,16 +10,17 @@ import org.springframework.data.domain.Page;
 public class OrderMapper {
     public static Order toEntity(OrderRequestDto orderRequestDto) {
         return Order.builder()
-                .productName(orderRequestDto.productName())
-                .amount(orderRequestDto.amount())
+                .quantity(orderRequestDto.quantity())
                 .build();
     }
 
     public static OrderResponseDto toResponse(Order order) {
         return OrderResponseDto.builder()
-                .id(order.getId())
-                .productName(order.getProductName())
-                .amount(order.getAmount())
+                .orderId(order.getOrderId())
+                .productId(order.getProduct().getId())
+                .productName(order.getProduct().getProductName())
+                .totalAmount(order.getTotalAmount())
+                .quantity(order.getQuantity())
                 .orderStatus(order.getOrderStatus())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())

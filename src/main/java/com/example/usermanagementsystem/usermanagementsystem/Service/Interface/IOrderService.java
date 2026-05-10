@@ -18,9 +18,9 @@ public interface IOrderService {
 
     PageResponse<OrderResponseDto> getAllOrders(Integer page, Integer size, Boolean ascending, String sortBy, String name);
 
-    void deleteOrderById(Integer id);
+    void deleteOrderByOrderId(String orderId);
 
-    void cancelOrderById(Integer id);
+    void cancelOrderByOrderId(String orderId);
 
-    OrderResponseDto patchOrderById(OrderPatchDto orderPatchDto, Integer id);
+    OrderResponseDto patchOrderById(OrderPatchDto orderPatchDto, String orderId);
 }

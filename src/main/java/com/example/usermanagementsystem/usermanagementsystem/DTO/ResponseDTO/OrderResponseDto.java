@@ -9,9 +9,11 @@ import java.time.LocalDateTime;
 
 @Builder
 public record OrderResponseDto(
-        Integer id,
+        String orderId,
+        Integer productId,
         String productName,
-        Integer amount,
+        Integer totalAmount,
+        Integer quantity,
         OrderStatus orderStatus,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
