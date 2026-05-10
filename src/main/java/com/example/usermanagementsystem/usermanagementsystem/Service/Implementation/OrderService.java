@@ -93,13 +93,9 @@ public class OrderService implements IOrderService {
     @Cacheable(value = "orders" , key = "#id")
     @Override
     public List<OrderResponseDto> getOrdersByUser(Integer id) {
-        Optional<UserInfo> user = userRepository.findByIdAndIsActive(id, true);
-        if(user.isPresent()) {
-            log.info("Getting Order for the user with id: {}", id);
-            return orderRepository.findAllByUserIdAndIsActiveTrue(user.get().getId()).stream().map(OrderMapper::toResponse).toList();
-        }
-        else
-            throw new UsernameNotFoundException("User not found with the id: "+ id );
+        UserInfo user = userRepository.findByIdAndIsActive(id, true).orElseThrow(() -> new UsernameNotFoundException("User not found with the id: "+ id ));
+        log.info("Getting Order for the user with id: {}", id);
+        return orderRepository.findAllByUserIdAndIsActiveTrue(user.getId()).stream().map(OrderMapper::toResponse).toList();
     }
 
 

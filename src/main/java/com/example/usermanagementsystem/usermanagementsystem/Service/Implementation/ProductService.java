@@ -15,6 +15,9 @@ import com.example.usermanagementsystem.usermanagementsystem.Mapper.ProductMappe
 import com.example.usermanagementsystem.usermanagementsystem.Repository.ProductRepository;
 import com.example.usermanagementsystem.usermanagementsystem.Service.Interface.IProductService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,15 +43,16 @@ public class ProductService implements IProductService {
         Product product = ProductMapper.toEntity(productRequestDto);
         product.setIsActive(true);
         return ProductMapper.toResponse(productRepository.save(product));
-        //TODO have to start from the mapper and store it on db with orderId as UUID
     }
 
+    @Cacheable(value = "products", key = "#id")
     @Override
     public ProductResponseDto getProductById(Integer id) {
         log.info("Getting product with id:({})", id);
         return ProductMapper.toResponse(productRepository.findById(id).orElseThrow(()-> new ProductNotFoundException("There is no Product with id:"+id)));
     }
 
+    @Cacheable(value = "allProducts" , key = "#page + '_' + #size +  '_' + #ascending + '_' + #sortBy + '_' + #search" )
     @Override
     public PageResponse<ProductResponseDto> getAllProducts(int page, int size, boolean ascending, String sortBy, String search) {
         log.info("Getting All Product");
@@ -58,6 +62,7 @@ public class ProductService implements IProductService {
         return PageMapper.toPageResponse(productPage.map(ProductMapper::toResponse));
     }
 
+    @CachePut(value = "products", key = "#id")
     @Override
     public ProductResponseDto patchOrderById(ProductPatchDto productPatchDto, Integer id) {
         Product product = productRepository.findByIdAndIsActiveTrue(id).orElseThrow(() -> new ProductNotFoundException("There is no Product with id: "+ id));
@@ -71,6 +76,7 @@ public class ProductService implements IProductService {
             return ProductMapper.toResponse(productRepository.save(product));
     }
 
+    @CacheEvict(value = "products", key = "#id")
     @Override
     public void deleteProductById(Integer id) {
         Product product = productRepository.findByIdAndIsActiveTrue(id).orElseThrow(()-> new ProductNotFoundException("There is no product with id: "+id));
